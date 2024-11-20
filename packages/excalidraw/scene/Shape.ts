@@ -25,6 +25,7 @@ import { canChangeRoundness } from "./comparisons";
 import type { EmbedsValidationStatus } from "../types";
 import { pointFrom, pointDistance, type LocalPoint } from "../../math";
 import { getCornerRadius, isPathALoop } from "../shapes";
+import { removeElbowArrowShortSegments } from "../element/elbowarrow";
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -503,15 +504,17 @@ const generateElbowArrowShape = (
   points: readonly LocalPoint[],
   radius: number,
 ) => {
+  //const simplifiedPoints = removeElbowArrowShortSegments<LocalPoint>(points);
+  const simplifiedPoints = points;
   const subpoints = [] as [number, number][];
-  for (let i = 1; i < points.length - 1; i += 1) {
-    const prev = points[i - 1];
-    const next = points[i + 1];
-    const point = points[i];
+  for (let i = 1; i < simplifiedPoints.length - 1; i += 1) {
+    const prev = simplifiedPoints[i - 1];
+    const next = simplifiedPoints[i + 1];
+    const point = simplifiedPoints[i];
     const corner = Math.min(
       radius,
-      pointDistance(points[i], next) / 2,
-      pointDistance(points[i], prev) / 2,
+      pointDistance(simplifiedPoints[i], next) / 2,
+      pointDistance(simplifiedPoints[i], prev) / 2,
     );
 
     const prevIsHorizontal =
@@ -519,40 +522,52 @@ const generateElbowArrowShape = (
     if (prevIsHorizontal) {
       if (prev[0] < point[0]) {
         // LEFT
-        subpoints.push([points[i][0] - corner, points[i][1]]);
+        subpoints.push([
+          simplifiedPoints[i][0] - corner,
+          simplifiedPoints[i][1],
+        ]);
       } else {
         // RIGHT
-        subpoints.push([points[i][0] + corner, points[i][1]]);
+        subpoints.push([
+          simplifiedPoints[i][0] + corner,
+          simplifiedPoints[i][1],
+        ]);
       }
     } else if (prev[1] < point[1]) {
       // UP
-      subpoints.push([points[i][0], points[i][1] - corner]);
+      subpoints.push([simplifiedPoints[i][0], simplifiedPoints[i][1] - corner]);
     } else {
-      subpoints.push([points[i][0], points[i][1] + corner]);
+      subpoints.push([simplifiedPoints[i][0], simplifiedPoints[i][1] + corner]);
     }
 
-    subpoints.push(points[i] as [number, number]);
+    subpoints.push(simplifiedPoints[i] as [number, number]);
 
     const nextIsHorizontal =
       Math.abs(point[1] - next[1]) < Math.abs(point[0] - next[0]);
     if (nextIsHorizontal) {
       if (next[0] < point[0]) {
         // LEFT
-        subpoints.push([points[i][0] - corner, points[i][1]]);
+        subpoints.push([
+          simplifiedPoints[i][0] - corner,
+          simplifiedPoints[i][1],
+        ]);
       } else {
         // RIGHT
-        subpoints.push([points[i][0] + corner, points[i][1]]);
+        subpoints.push([
+          simplifiedPoints[i][0] + corner,
+          simplifiedPoints[i][1],
+        ]);
       }
     } else if (next[1] < point[1]) {
       // UP
-      subpoints.push([points[i][0], points[i][1] - corner]);
+      subpoints.push([simplifiedPoints[i][0], simplifiedPoints[i][1] - corner]);
     } else {
       // DOWN
-      subpoints.push([points[i][0], points[i][1] + corner]);
+      subpoints.push([simplifiedPoints[i][0], simplifiedPoints[i][1] + corner]);
     }
   }
 
-  const d = [`M ${points[0][0]} ${points[0][1]}`];
+  const d = [`M ${simplifiedPoints[0][0]} ${simplifiedPoints[0][1]}`];
   for (let i = 0; i < subpoints.length; i += 3) {
     d.push(`L ${subpoints[i][0]} ${subpoints[i][1]}`);
     d.push(
@@ -561,7 +576,11 @@ const generateElbowArrowShape = (
       } ${subpoints[i + 2][1]}`,
     );
   }
-  d.push(`L ${points[points.length - 1][0]} ${points[points.length - 1][1]}`);
+  d.push(
+    `L ${simplifiedPoints[simplifiedPoints.length - 1][0]} ${
+      simplifiedPoints[simplifiedPoints.length - 1][1]
+    }`,
+  );
 
   return d.join(" ");
 };

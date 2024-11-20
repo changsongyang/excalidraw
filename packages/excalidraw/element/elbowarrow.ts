@@ -277,8 +277,8 @@ export const updateElbowArrowPoints = (
           );
       nextFixedSegments[segmentIdx].anchor = anchor;
 
-      debugDrawPoint(startHandle, { color: "red" });
-      debugDrawPoint(endHandle, { color: "green" });
+      // debugDrawPoint(startHandle, { color: "red" });
+      // debugDrawPoint(endHandle, { color: "green" });
       debugDrawPoint(anchor);
 
       const el = {
@@ -387,16 +387,14 @@ export const updateElbowArrowPoints = (
   ]);
 
   const simplifiedPoints = getElbowArrowCornerPoints(
-    removeElbowArrowShortSegments(
-      pointPairs.map(([state, points], idx) =>
-        generatePoints(
-          state,
-          points,
-          idx,
-          pointPairs.length - 1,
-          fakeElementsMap,
-          options,
-        ),
+    pointPairs.map(([state, points], idx) =>
+      generatePoints(
+        state,
+        points,
+        idx,
+        pointPairs.length - 1,
+        fakeElementsMap,
+        options,
       ),
     ),
   ).flat();
@@ -1499,23 +1497,44 @@ const getElbowArrowCornerPoints = (
   return pointGroups;
 };
 
-const removeElbowArrowShortSegments = (
-  pointGroups: GlobalPoint[][],
-): GlobalPoint[][] => {
-  const points = pointGroups.flat();
+// export const removeElbowArrowShortSegments = <
+//   Point extends GlobalPoint | LocalPoint,
+// >(
+//   pointGroups: readonly Point[][],
+// ): Point[][] => {
+//   const points = pointGroups.flat();
 
+//   if (points.length >= 4) {
+//     return multiDimensionalArrayDeepFilter(pointGroups, (p, idx) => {
+//       if (idx === 0 || idx === points.length - 1) {
+//         return true;
+//       }
+
+//       const prev = points[idx - 1];
+//       return pointDistance(prev, p) > 0.2;
+//     });
+//   }
+
+//   return Array.from(pointGroups);
+// };
+
+export const removeElbowArrowShortSegments = <
+  Point extends GlobalPoint | LocalPoint,
+>(
+  points: readonly Point[],
+): readonly Point[] => {
   if (points.length >= 4) {
-    return multiDimensionalArrayDeepFilter(pointGroups, (p, idx) => {
+    return points.filter((p, idx) => {
       if (idx === 0 || idx === points.length - 1) {
         return true;
       }
 
       const prev = points[idx - 1];
-      return pointDistance(prev, p) > 0.2;
+      return pointDistance(prev, p) > 0.3;
     });
   }
 
-  return pointGroups;
+  return points;
 };
 
 const neighborIndexToHeading = (idx: number): Heading => {

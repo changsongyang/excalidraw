@@ -1254,7 +1254,7 @@ export class PromisePool<T> {
 }
 
 export const multiDimensionalArrayDeepFilter = <T>(
-  matrix: T[][],
+  matrix: readonly T[][],
   f: (item: T, index: number) => boolean,
 ) => {
   let pointer = 0;
