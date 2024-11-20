@@ -724,7 +724,6 @@ export class LinearElementEditor {
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
   } {
-    console.log("fsdfsdfdsfdsfsdfd");
     const appState = app.state;
     const elementsMap = scene.getNonDeletedElementsMap();
     const elements = scene.getNonDeletedElements();

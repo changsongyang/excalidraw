@@ -6925,9 +6925,16 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
       } else {
-        if (this.state.selectedLinearElement) {
-          const linearElementEditor =
-            this.state.editingLinearElement || this.state.selectedLinearElement;
+        let linearElementEditor =
+          this.state.editingLinearElement || this.state.selectedLinearElement;
+        const elementUnderCursor = this.getElementAtPosition(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+        );
+        if (elementUnderCursor && isElbowArrow(elementUnderCursor)) {
+          linearElementEditor = new LinearElementEditor(elementUnderCursor);
+        }
+        if (linearElementEditor) {
           const ret = LinearElementEditor.handlePointerDown(
             event,
             this,
@@ -6957,13 +6964,6 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.x,
             pointerDownState.origin.y,
           );
-        console.log(
-          "pointerDownState.hit",
-          this.getElementAtPosition(
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-          ),
-        );
         if (
           this.state.croppingElementId &&
           pointerDownState.hit.element?.id !== this.state.croppingElementId
@@ -7847,11 +7847,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
       const elementsMap = this.scene.getNonDeletedElementsMap();
-      console.log(
-        this.state.editingLinearElement,
-        this.state.selectedLinearElement,
-        getSelectedElements(elementsMap, this.state),
-      );
       if (this.state.selectedLinearElement) {
         const linearElementEditor =
           this.state.editingLinearElement || this.state.selectedLinearElement;
