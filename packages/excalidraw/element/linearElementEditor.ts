@@ -309,6 +309,13 @@ export class LinearElementEditor {
             isDragging: selectedIndex === lastClickedPoint,
           },
         ]);
+        if (isElbowArrow(element)) {
+          LinearElementEditor.updateEditorMidPointsCache(
+            element,
+            elementsMap,
+            app.state,
+          );
+        }
       } else {
         const newDraggingPointPosition = LinearElementEditor.createPointAt(
           element,
@@ -344,6 +351,13 @@ export class LinearElementEditor {
             };
           }),
         );
+        if (isElbowArrow(element)) {
+          LinearElementEditor.updateEditorMidPointsCache(
+            element,
+            elementsMap,
+            app.state,
+          );
+        }
       }
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
@@ -434,6 +448,13 @@ export class LinearElementEditor {
                     : element.points[0],
               },
             ]);
+            if (isElbowArrow(element)) {
+              LinearElementEditor.updateEditorMidPointsCache(
+                element,
+                elementsMap,
+                appState,
+              );
+            }
           }
 
           const bindingElement = isBindingEnabled(appState)
@@ -703,6 +724,7 @@ export class LinearElementEditor {
     hitElement: NonDeleted<ExcalidrawElement> | null;
     linearElementEditor: LinearElementEditor | null;
   } {
+    console.log("fsdfsdfdsfdsfsdfd");
     const appState = app.state;
     const elementsMap = scene.getNonDeletedElementsMap();
     const elements = scene.getNonDeletedElements();
@@ -941,6 +963,13 @@ export class LinearElementEditor {
           point: newPoint,
         },
       ]);
+      if (isElbowArrow(element)) {
+        LinearElementEditor.updateEditorMidPointsCache(
+          element,
+          elementsMap,
+          appState,
+        );
+      }
     } else {
       LinearElementEditor.addPoints(element, [{ point: newPoint }]);
     }
@@ -1177,6 +1206,13 @@ export class LinearElementEditor {
           point: pointFrom(lastPoint[0] + 30, lastPoint[1] + 30),
         },
       ]);
+      if (isElbowArrow(element)) {
+        LinearElementEditor.updateEditorMidPointsCache(
+          element,
+          elementsMap,
+          appState,
+        );
+      }
     }
 
     return {
